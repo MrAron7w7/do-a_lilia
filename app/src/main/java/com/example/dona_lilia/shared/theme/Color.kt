@@ -1,4 +1,4 @@
-package com.example.dona_lilia.ui.theme
+package com.example.dona_lilia.shared.theme
 
 import androidx.compose.ui.graphics.Color
 
