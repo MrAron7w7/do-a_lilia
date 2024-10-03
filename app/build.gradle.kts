@@ -50,6 +50,13 @@ android {
 }
 
 dependencies {
+    val nav_version = "2.8.0"
+
+    implementation("androidx.navigation:navigation-compose:$nav_version")
+
+    // Coil para cargar imágenes
+    implementation("io.coil-kt:coil-compose:2.7.0")
+
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

@@ -6,6 +6,8 @@ import androidx.compose.runtime.Composable
 
 @Composable
 
-fun CustomLabel () {
-    Text( text =  "SI ARON SI COMMIT Y PUSH" )
+fun CustomLabel (
+    text : String,
+) {
+    Text( text =  text )
 }
