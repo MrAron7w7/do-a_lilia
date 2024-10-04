@@ -7,17 +7,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import com.example.dona_lilia.shared.components.CustomLabel
+import com.example.dona_lilia.shared.components.CusttomLayout
 
 @Composable
 fun TicketDetails (
     navController : NavController
 ) {
-    // TODO: Implement ticket details view here
-    Scaffold { innerPadding ->
-        Column (
-            modifier = Modifier.padding(innerPadding)
-        ) {
-            CustomLabel( text = "Details")
-        }
+    CusttomLayout(
+        title = "DETALLES DE BOLETA"
+    ) {
+
     }
 }
