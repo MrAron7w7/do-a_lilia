@@ -50,12 +50,20 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.navigation.runtime.ktx)
     val nav_version = "2.8.0"
 
     implementation("androidx.navigation:navigation-compose:$nav_version")
 
     // Coil para cargar imágenes
     implementation("io.coil-kt:coil-compose:2.7.0")
+
+    // iText (librería para crear PDFs)
+    implementation("com.itextpdf:itext7-core:7.2.6")
+    // Si estás utilizando Compose
+    implementation("androidx.compose.ui:ui:1.4.0")
+    implementation("androidx.compose.material3:material3:1.1.0")
+    implementation("androidx.compose.foundation:foundation:1.4.0")
 
 
     implementation(libs.androidx.core.ktx)
