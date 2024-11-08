@@ -60,6 +60,8 @@ dependencies {
 
     // iText (librería para crear PDFs)
     implementation("com.itextpdf:itext7-core:7.2.6")
+
+    implementation("com.google.accompanist:accompanist-flowlayout:0.30.1")
     // Si estás utilizando Compose
     implementation("androidx.compose.ui:ui:1.4.0")
     implementation("androidx.compose.material3:material3:1.1.0")
