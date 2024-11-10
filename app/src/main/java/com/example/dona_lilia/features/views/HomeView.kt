@@ -100,7 +100,7 @@ fun HomeView (
                     text = "Lista de Boletas",
                     painter = painterResource(id = R.drawable.description)
                 ) {
-                    navController.navigate(ItemNavigation.TicketDetailsView.route)
+                    navController.navigate(ItemNavigation.TicketListView.route)
                 }
             }
 
