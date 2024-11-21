@@ -53,7 +53,7 @@ var ListUsers = mutableListOf<Users>()
 @Composable
 fun TicketDetails(
     ticket: Tickets,
-    navController: NavController,
+    navController: NavController
 ) {
     CusttomLayout(
         title = "Detalles de Boleta"
