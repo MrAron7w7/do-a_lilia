@@ -2,7 +2,6 @@ package com.example.dona_lilia.features.views
 
 import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -25,6 +24,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.dona_lilia.features.models.Products
 import com.example.dona_lilia.features.models.Tickets
+import com.example.dona_lilia.shared.components.CustomLabel
 import com.example.dona_lilia.shared.components.CusttomLayout
 import com.example.dona_lilia.shared.theme.background
 import com.example.dona_lilia.shared.theme.colorcard
@@ -217,7 +218,7 @@ fun TicketList(
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 items(sortedOrders) { tickets ->
-                    OrderTicket(tickets, navController)
+                    OrderTicket(tickets)
                 }
             }
 
@@ -257,16 +258,11 @@ fun TicketList(
 }
 
 @Composable
-fun OrderTicket(
-    tickets: Tickets,
-    navController: NavController
-) {
+fun OrderTicket(tickets: Tickets) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 15.dp).clickable {
-                navController.navigate("ticket_details/${tickets.cod}")
-            },
+            .padding(horizontal = 15.dp),
         shape = RoundedCornerShape(22.dp),
         colors = CardDefaults.cardColors(containerColor = colorcard)
     ) {

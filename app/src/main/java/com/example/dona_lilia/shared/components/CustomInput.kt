@@ -16,11 +16,13 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun CustomInput(
+    value: String,
     modifier: Modifier = Modifier,
+    onValueChange: (String) -> Unit
 ) {
   OutlinedTextField(
-      value = "",
-      onValueChange = {},
+      value = value,
+      onValueChange = onValueChange,
       modifier = Modifier.height(45.dp),
       keyboardOptions = KeyboardOptions(
           keyboardType = KeyboardType.Text

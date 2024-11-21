@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "74079952894",
+    "project_id": "dona-lili-55a93",
+    "storage_bucket": "dona-lili-55a93.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:74079952894:android:bca87fdc2098284eca2aaf",
+        "android_client_info": {
+          "package_name": "com.example.dona_lilia"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB_jo8uCirQR0pxf_gV6NO4oZnyaDSaMAI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

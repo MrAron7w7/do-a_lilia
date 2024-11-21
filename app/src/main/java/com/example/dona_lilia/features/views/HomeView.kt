@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.dona_lilia.R
 import com.example.dona_lilia.core.route.ItemNavigation
+import com.example.dona_lilia.features.services.FirebaseService
 import com.example.dona_lilia.shared.components.CustomLabel
 import com.example.dona_lilia.shared.components.CusttomLayout
 
@@ -40,6 +41,7 @@ fun HomeView (
     navController : NavController
 
 ) {
+    val db = FirebaseService()
     CusttomLayout(
 
         title = "INICIO"

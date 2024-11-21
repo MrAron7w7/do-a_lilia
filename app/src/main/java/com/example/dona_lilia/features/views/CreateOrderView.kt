@@ -1,6 +1,7 @@
 package com.example.dona_lilia.features.views
 
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -19,17 +20,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
+import com.example.dona_lilia.features.models.Products
+import com.example.dona_lilia.features.models.Tickets
+import com.example.dona_lilia.features.models.Users
+import com.example.dona_lilia.features.services.FirebaseService
 import com.example.dona_lilia.shared.components.*
+import java.util.Date
+
 
 @Composable
 fun CreateOrderView(
     navController: NavController
 ) {
+    val context = LocalContext.current
+    val db = FirebaseService()
     CusttomLayout(
         title = "CREAR PEDIDO"
     ) {
@@ -104,7 +114,40 @@ fun CreateOrderView(
                 Spacer(modifier = Modifier.height(20.dp))
 
                 CustomButton(text = "CREAR") {
+                    Toast.makeText(context, "Agregado", Toast.LENGTH_LONG).show()
                     // Action to create order
+                    val product = Products(
+                        productName = "Producto A",
+                        quantity = 10,
+                        unitPrice = 15.5
+                    )
+                    val ticket = Tickets(
+                        cod = "T12345",
+                        clientName = "Cliente A",
+                        reference = "Referencia",
+                        phoneNumber = "987654321",
+                        ruc = "12345678901",
+                        destination = "Destino A",
+                        deliveryDate = Date(),
+                        products = listOf(
+                            Products("Producto A", 2, 15.0)
+                        ), // Productos seleccionados
+                        totalAmount = 155.0,
+                        relevance = "Alta"
+                    )
+
+
+                    val user = Users(
+                        name = "Usuario A",
+                        ruc = "12345678901",
+                        phone = "987654321",
+                        address = "Dirección A",
+                        referece = "Referencia"
+                    )
+                    db.addUser(user)
+                    db.addTicket(ticket)
+                    db.addProduct(product)
+
                 }
 
                 CustomButton(text = "ATRAS") {
@@ -126,7 +169,7 @@ fun CustomerInputFields() {
         ) {
             CustomLabel(text = "$label:")
             Spacer(modifier = Modifier.width(10.dp))
-            CustomInput()
+
         }
         Spacer(modifier = Modifier.height(5.dp))
     }
