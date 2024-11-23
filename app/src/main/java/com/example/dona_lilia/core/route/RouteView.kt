@@ -2,21 +2,35 @@ package com.example.dona_lilia.core.route
 
 import android.widget.Toast
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.dona_lilia.features.models.Tickets
+import com.example.dona_lilia.features.services.FirebaseService
 import com.example.dona_lilia.features.views.CreateOrderView
 import com.example.dona_lilia.features.views.HomeView
-import com.example.dona_lilia.features.views.ListTickets
+import com.example.dona_lilia.features.views.ProductsView
 import com.example.dona_lilia.features.views.TicketDetails
 import com.example.dona_lilia.features.views.TicketList
 
 @Composable
 fun RouteView () {
     val context = LocalContext.current
-
     val navController = rememberNavController()
+    val firebaseService = FirebaseService()
+    var tickets by remember { mutableStateOf(listOf<Tickets>()) }
+
+    LaunchedEffect(Unit) {
+        firebaseService.fetchTickets().collect { fetchedTickets ->
+            tickets = fetchedTickets
+        }
+    }
 
     NavHost(
         navController = navController,
@@ -46,7 +60,7 @@ fun RouteView () {
             route = "ticket_details/{ticketId}"
         ) { backStackEntry ->
             val ticketId = backStackEntry.arguments?.getString("ticketId") ?: ""
-            val ticket = ListTickets.firstOrNull { it.cod == ticketId }
+            val ticket = tickets.firstOrNull { it.cod == ticketId }
 
             if (ticket != null) {
                 TicketDetails(
@@ -67,6 +81,13 @@ fun RouteView () {
             TicketList(
                 navController = navController
             )
+        }
+
+        // -> ProductsView
+        composable(
+            route = ItemNavigation.ProductsView.route
+        ) {
+            ProductsView(navController)
         }
     }
 }

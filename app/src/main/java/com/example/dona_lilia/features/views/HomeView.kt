@@ -95,7 +95,7 @@ fun HomeView (
                     text = "Productos",
                     painter = painterResource(id = R.drawable.box_card)
                 ) {
-
+                    navController.navigate(ItemNavigation.ProductsView.route)
                 }
 
                 CustomCardHome(

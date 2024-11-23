@@ -28,6 +28,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,6 +44,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.dona_lilia.features.models.Products
 import com.example.dona_lilia.features.models.Tickets
+import com.example.dona_lilia.features.services.FirebaseService
 import com.example.dona_lilia.shared.components.CusttomLayout
 import com.example.dona_lilia.shared.theme.background
 import com.example.dona_lilia.shared.theme.colorcard
@@ -53,109 +55,37 @@ import java.util.Locale
 
 val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
-var ListTickets = mutableListOf(
-    Tickets(
-        cod = "019701",
-        clientName = "Pedro Yasuo Chavez Chamba",
-        reference = "REF101",
-        phoneNumber = "+51 936 548 401",
-        ruc = "1234567891",
-        destination = "Lima",
-        deliveryDate = dateFormat.parse("2024-11-07")!!,
-        products = listOf(
-            Products("Producto A", 2, 15.0)
-        ),
-        totalAmount = 30.0,
-        relevance = "verde"
-    ),
-    Tickets(
-        cod = "019702",
-        clientName = "Natalia Manchego Buenamarca",
-        reference = "REF102",
-        phoneNumber = "+51 936 548 402",
-        ruc = "2234567892",
-        destination = "Arequipa",
-        deliveryDate = dateFormat.parse("2024-11-08")!!,
-        products = listOf(
-            Products("Producto B", 3, 12.0)
-        ),
-        totalAmount = 36.0,
-        relevance = "amarillo"
-    ),
-    Tickets(
-        cod = "019703",
-        clientName = "Aron Magallanes",
-        reference = "REF103",
-        phoneNumber = "+51 936 548 403",
-        ruc = "3234567893",
-        destination = "Cusco",
-        deliveryDate = dateFormat.parse("2024-11-09")!!,
-        products = listOf(
-            Products("Producto C", 1, 25.0)
-        ),
-        totalAmount = 25.0,
-        relevance = "rojo"
-    ),
-    Tickets(
-        cod = "019704",
-        clientName = "Valeria Nicole Pachas Quintanilla",
-        reference = "REF104",
-        phoneNumber = "+51 936 548 404",
-        ruc = "4234567894",
-        destination = "Trujillo",
-        deliveryDate = dateFormat.parse("2024-11-10")!!,
-        products = listOf(
-            Products("Producto D", 5, 10.0)
-        ),
-        totalAmount = 50.0,
-        relevance = "verde"
-    ),
-    Tickets(
-        cod = "019704",
-        clientName = "Valeria Nicole Pachas Quintanilla",
-        reference = "REF104",
-        phoneNumber = "+51 936 548 404",
-        ruc = "4234567894",
-        destination = "Trujillo",
-        deliveryDate = dateFormat.parse("2024-11-10")!!,
-        products = listOf(
-            Products("Producto D", 5, 10.0)
-        ),
-        totalAmount = 50.0,
-        relevance = "verde"
-    ),
-    Tickets(
-        cod = "019704",
-        clientName = "Valeria Nicole Pachas Quintanilla",
-        reference = "REF104",
-        phoneNumber = "+51 936 548 404",
-        ruc = "4234567894",
-        destination = "Trujillo",
-        deliveryDate = dateFormat.parse("2024-11-10")!!,
-        products = listOf(
-            Products("Producto D", 5, 10.0)
-        ),
-        totalAmount = 50.0,
-        relevance = "verde"
-    )
-)
+
+
+
 
 @Composable
 fun TicketList(
     navController: NavController
 ) {
+    val firebaseService= FirebaseService()
+    var tickets by remember { mutableStateOf(listOf<Tickets>()) }
+    var filterByDate by remember { mutableStateOf(  true) }
+    var isLoading by remember { mutableStateOf(true) }
+    val context= LocalContext.current
+
+    LaunchedEffect(Unit) {
+        firebaseService.fetchTickets().collect { fetchedTickets ->
+            tickets = fetchedTickets
+            isLoading = false
+        }
+    }
+
+
     CusttomLayout(
         title = "LISTA DE BOLETAS"
     ) {
-        val context = LocalContext.current
-        var filterByDate by remember { mutableStateOf(true) }
-
         // Ordenamos la lista en función del filtro actual
-        val sortedOrders = remember(filterByDate) {
+        val sortedOrders = remember(tickets, filterByDate) {
             if (filterByDate) {
-                ListTickets.sortedBy { it.deliveryDate }
+                tickets.sortedBy { it.deliveryDate }
             } else {
-                ListTickets.sortedBy {
+                tickets.sortedBy {
                     when (it.relevance) {
                         "rojo" -> 1
                         "amarillo" -> 2
@@ -228,7 +158,7 @@ fun TicketList(
             ) {
                 Button(
                     onClick = {
-                        Toast.makeText(context, "Contabilizar", Toast.LENGTH_SHORT).show()
+                        navController.popBackStack()
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -236,7 +166,7 @@ fun TicketList(
                     colors = ButtonDefaults.buttonColors(primary),
                     shape = RoundedCornerShape(15.dp)
                 ) {
-                    Text("CONTABILIZAR", fontWeight = FontWeight.Bold, color = Color.White)
+                    Text("ATRAS", fontWeight = FontWeight.Bold, color = Color.White)
                 }
 
                 Spacer(modifier = Modifier.height(10.dp))
@@ -264,7 +194,8 @@ fun OrderTicket(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 15.dp).clickable {
+            .padding(horizontal = 15.dp)
+            .clickable {
                 navController.navigate("ticket_details/${tickets.cod}")
             },
         shape = RoundedCornerShape(22.dp),

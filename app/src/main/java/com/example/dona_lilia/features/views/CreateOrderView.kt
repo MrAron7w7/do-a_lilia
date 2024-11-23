@@ -14,6 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -142,7 +143,9 @@ fun CreateOrderView(
                         ruc = "12345678901",
                         phone = "987654321",
                         address = "Dirección A",
-                        referece = "Referencia"
+                        referece = "Referencia",
+                        destine = "Europe",
+                        date = "2014-23-11"
                     )
                     db.addUser(user)
                     db.addTicket(ticket)
@@ -169,7 +172,9 @@ fun CustomerInputFields() {
         ) {
             CustomLabel(text = "$label:")
             Spacer(modifier = Modifier.width(10.dp))
-
+            CustomInput(value = "") {
+                
+            }
         }
         Spacer(modifier = Modifier.height(5.dp))
     }
@@ -249,7 +254,8 @@ fun ProductCard(
                         .background(optionColor)
                         .padding(horizontal = 12.dp, vertical = 6.dp)
                         .clickable {
-                            selectedOption.value = selectedOption.value.toMutableMap()
+                            selectedOption.value = selectedOption.value
+                                .toMutableMap()
                                 .apply { put(product, index) }
                         }
                 ) {
