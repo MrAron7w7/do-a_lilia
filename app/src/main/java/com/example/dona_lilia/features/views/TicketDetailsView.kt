@@ -1,20 +1,14 @@
 package com.example.dona_lilia.features.views
 
-import android.annotation.SuppressLint
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Environment
+import android.provider.MediaStore
 import android.widget.Toast
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -28,6 +22,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -35,94 +30,112 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.FileProvider
 import androidx.navigation.NavController
+import androidx.core.content.FileProvider
 import com.example.dona_lilia.features.models.Tickets
-import com.example.dona_lilia.features.models.Users
 import com.example.dona_lilia.shared.components.CusttomLayout
 import com.example.dona_lilia.shared.components.ProductItem
+import com.itextpdf.kernel.colors.ColorConstants
+import com.itextpdf.kernel.colors.DeviceRgb
+import com.itextpdf.kernel.geom.PageSize
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.kernel.pdf.PdfWriter
 import com.itextpdf.layout.Document
+import com.itextpdf.layout.borders.Border
+import com.itextpdf.layout.element.Cell
 import com.itextpdf.layout.element.Paragraph
-import java.io.File
-import java.io.FileOutputStream
+import com.itextpdf.layout.element.Table
+import com.itextpdf.layout.properties.TextAlignment
+import com.itextpdf.layout.properties.UnitValue
+import java.io.OutputStream
+import java.text.SimpleDateFormat
+import java.util.Locale
 
-var ListUsers = mutableListOf<Users>()
-
+@RequiresApi(Build.VERSION_CODES.Q)
 @Composable
 fun TicketDetails(
     ticket: Tickets,
     navController: NavController
 ) {
-    CusttomLayout(
-        title = "Detalles de Boleta"
-    ) {
+    CusttomLayout(title = "Detalles de Boleta") {
         val context = LocalContext.current
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
                 .padding(16.dp)
         ) {
             // Información del cliente
             Card(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .weight(1f)
                     .padding(vertical = 10.dp),
                 colors = CardDefaults.cardColors(MaterialTheme.colorScheme.tertiary),
                 shape = RoundedCornerShape(20.dp)
             ) {
                 Column(
-                    modifier = Modifier.fillMaxWidth().padding(16.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
                 ) {
-                    Row (
+                    Row(
                         Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Start
-                    ){
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Icon(
                             modifier = Modifier.size(70.dp),
                             tint = Color.Black,
                             imageVector = Icons.Default.AccountCircle,
-                            contentDescription = null)
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Column(){
-                            Text("RUC: ${ticket.ruc}",
+                            contentDescription = null
+                        )
+                        Spacer(modifier = Modifier.width(15.dp))
+                        Column {
+                            Text(
+                                "N°: ${ticket.cod}",
                                 style = TextStyle(
                                     color = MaterialTheme.colorScheme.primary,
                                     fontWeight = FontWeight.Bold,
-                                    fontSize = 15.sp
+                                    fontSize = 20.sp
                                 )
                             )
-                            Text("N°: ${ticket.cod}")
+                            Text("RUC: ${ticket.ruc}", style = TextStyle(color = Color.Black))
                         }
                     }
                     Spacer(modifier = Modifier.height(8.dp))
-                    Row (
+                    Row(
                         Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
-                    ){
-                        Column(
-                        ) {
+                    ) {
+                        Column {
                             Text(
                                 text = "Cliente: ${ticket.clientName}",
                                 style = TextStyle(color = Color.Black, fontWeight = FontWeight.Bold)
                             )
-                            Text("${ticket.phoneNumber}")
-                            Text("${ticket.destination}")
+                            Text(ticket.phoneNumber, style = TextStyle(color = Color.Black))
+                            Text(ticket.destination, style = TextStyle(color = Color.Black))
                         }
-                        Text("Fecha de Entrega: ${dateFormat.format(ticket.deliveryDate)}",
+                        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                        Text(
+                            "Fecha de Entrega: ${dateFormat.format(ticket.deliveryDate)}",
                             style = TextStyle(color = Color.Black, fontWeight = FontWeight.Bold)
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
                     Text(
                         text = "Productos Seleccionados",
-                        style = TextStyle(color = Color.Black, fontWeight = FontWeight.Bold)
+                        style = TextStyle(color = Color.Black, fontWeight = FontWeight.Bold
+                        )
+                    )
+                    Text(
+                        "Cantidad: ${ticket.products.size} productos",
+                        style = TextStyle(color = Color.Black, fontWeight = FontWeight.Bold
+                        )
                     )
 
                     LazyColumn(
-                        //modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.Top
                     ) {
                         items(ticket.products) { product ->
                             ProductItem(product = product)
@@ -131,317 +144,244 @@ fun TicketDetails(
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
-            Button(
-                onClick = { generatePdf(context) },
-                Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 15.dp)
-                    .height(50.dp),
-                colors = ButtonDefaults.buttonColors(Color(0xff031982)),
-                shape = RoundedCornerShape(15.dp)
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceAround
             ) {
-                Text(text = "Descargar PDF")
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-            // Botón para regresar
-            Button(
-                onClick = { navController.popBackStack() },
-                Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 15.dp)
-                    .height(50.dp),
-                colors = ButtonDefaults.buttonColors(Color(0xff031982)),
-                shape = RoundedCornerShape(15.dp)
-            ) {
-                Text(text = "Regresar")
-            }
-        }
-    }
-}
+                Button(
+                    onClick = { generatePdf(context, ticket) },
+                    Modifier
 
-fun generatePdf(context: Context) {
-    try {
-        // Obtener el siguiente nombre disponible para el archivo
-        val fileName = getNextFileName()
-
-        // Crear el archivo PDF en la carpeta de descargas con el nombre generado
-        val file = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "$fileName.pdf")
-        val fileOutputStream = FileOutputStream(file)
-
-        // Crear un PdfWriter para escribir el PDF
-        val pdfWriter = PdfWriter(fileOutputStream)
-        val pdfDocument = PdfDocument(pdfWriter)
-        val document = Document(pdfDocument)
-
-        // Configurar título
-        document.add(Paragraph("Ticket Detail").setBold().setFontSize(18f))
-
-        // Información de la boleta (RUC, nombre, celular, fecha)
-        document.add(Paragraph("RUC: 12222222"))
-        document.add(Paragraph("Nombre: Camila Fernandez Dias"))
-        document.add(Paragraph("Celular: 1234567890"))
-        document.add(Paragraph("Fecha: 2024-11-07"))
-
-        // Añadir una línea de separación
-        document.add(Paragraph("----------------------------------"))
-
-        // Agregar los productos
-        ListUsers.forEach { user ->
-            document.add(Paragraph("Nombre: ${user.name}"))
-            document.add(Paragraph("Cantidad: ${user.address}"))
-            document.add(Paragraph("Precio: ${user.ruc}"))
-            document.add(Paragraph("----------------------------------"))
-        }
-
-        // Cerrar el documento
-        document.close()
-
-        // Verificamos si el archivo existe y mostramos un mensaje
-        if (file.exists()) {
-            Toast.makeText(context, "PDF guardado en Descargas: ${file.absolutePath}", Toast.LENGTH_LONG).show()
-
-            // Usar FileProvider para abrir el PDF
-            val fileUri = FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
-            val intent = Intent(Intent.ACTION_VIEW).apply {
-                setDataAndType(fileUri, "application/pdf")
-                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NO_HISTORY
-            }
-            context.startActivity(intent)
-        } else {
-            Toast.makeText(context, "No se pudo crear el PDF", Toast.LENGTH_SHORT).show()
-        }
-
-    } catch (e: Exception) {
-        e.printStackTrace()
-        Toast.makeText(context, "Error al crear el PDF", Toast.LENGTH_SHORT).show()
-    }
-}
-
-@SuppressLint("DefaultLocale")
-fun getNextFileName(): String {
-    // Directorio de descargas
-    val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-
-    // Prefijo y contador inicial
-    val prefix = "boleta_"
-    var counter = 1
-
-    // Incrementa el contador hasta encontrar un nombre de archivo no existente
-    var fileName: String
-    do {
-        fileName = "$prefix${String.format("%03d", counter)}"
-        counter++
-    } while (File(downloadsDir, "$fileName.pdf").exists())
-
-    return fileName // Retorna el nombre del archivo disponible
-}
-
-
-/*
-
-fun generatePdf(context: Context) {
-    try {
-        // Obtener el siguiente nombre disponible para el archivo
-        val fileName = getNextFileName()
-
-        // Crear el archivo PDF en la carpeta de descargas con el nombre generado
-        val file = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "$fileName.pdf")
-        val fileOutputStream = FileOutputStream(file)
-
-        // Crear un PdfWriter para escribir el PDF
-        val pdfWriter = PdfWriter(fileOutputStream)
-        val pdfDocument = PdfDocument(pdfWriter)
-        val document = Document(pdfDocument)
-
-        // Estilos
-        val titleStyle = Style().setFontSize(16f).setBold().setFontColor(ColorConstants.BLACK)
-        val textStyle = Style().setFontSize(12f).setFontColor(ColorConstants.BLACK)
-        val cardStyle = Style().setBorder(Border.NO_BORDER).setBackgroundColor(DeviceRgb(240, 240, 240)).setPadding(10f)
-
-        // Configurar título
-        document.add(Paragraph("Ticket Detail").setBold().setFontSize(18f))
-
-        // Encabezado
-        val headerTable = Table(2).setWidth(UnitValue.createPercentValue(100f))
-        headerTable.addCell(Cell().add(Paragraph("R.U.C: ${ticket.ruc}").addStyle(titleStyle)).setBorder(Border.NO_BORDER))
-        headerTable.addCell(Cell().add(Paragraph("N°: ${ticket.id}").addStyle(titleStyle).setTextAlignment(TextAlignment.RIGHT)).setBorder(Border.NO_BORDER))
-        headerTable.addCell(Cell().add(Paragraph("Cliente: ${ticket.clientName}").addStyle(textStyle)).setBorder(Border.NO_BORDER))
-        headerTable.addCell(Cell().add(Paragraph("Fecha de Entrega: ${ticket.deliveryDate}").addStyle(textStyle).setTextAlignment(TextAlignment.RIGHT)).setBorder(Border.NO_BORDER))
-        headerTable.addCell(Cell().add(Paragraph("Teléfono: ${ticket.phoneNumber}").addStyle(textStyle)).setBorder(Border.NO_BORDER))
-        headerTable.addCell(Cell().add(Paragraph("Destino: ${ticket.destination}").addStyle(textStyle).setTextAlignment(TextAlignment.RIGHT)).setBorder(Border.NO_BORDER))
-        document.add(headerTable)
-        // Espaciado
-        document.add(Paragraph("\n"))
-
-        // Añadir una línea de separación
-        document.add(Paragraph("----------------------------------"))
-        // Espaciado
-        document.add(Paragraph("\n"))
-
-        // Agregar los productos
-        ticket.products.forEach { product ->
-            val productCard = Table(1).setWidth(UnitValue.createPercentValue(100f)).addStyle(cardStyle)
-            productCard.addCell(Cell().add(Paragraph("Nombre: ${product.name}").addStyle(textStyle)).setBorder(Border.NO_BORDER))
-            productCard.addCell(Cell().add(Paragraph("Cantidad: ${product.quantity}").addStyle(textStyle)).setBorder(Border.NO_BORDER))
-            productCard.addCell(Cell().add(Paragraph("Precio: ${product.price}").addStyle(textStyle)).setBorder(Border.NO_BORDER))
-            document.add(productCard)
-            document.add(Paragraph("\n")) // Espaciado entre productos
-        }
-
-        // Cerrar el documento
-        document.close()
-
-        // Verificamos si el archivo existe y mostramos un mensaje
-        if (file.exists()) {
-            Toast.makeText(context, "PDF guardado en Descargas: ${file.absolutePath}", Toast.LENGTH_LONG).show()
-
-            // Usar FileProvider para abrir el PDF
-            val fileUri = FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
-            val intent = Intent(Intent.ACTION_VIEW).apply {
-                setDataAndType(fileUri, "application/pdf")
-                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NO_HISTORY
-            }
-            context.startActivity(intent)
-        } else {
-            Toast.makeText(context, "No se pudo crear el PDF", Toast.LENGTH_SHORT).show()
-        }
-
-    } catch (e: Exception) {
-        e.printStackTrace()
-        Toast.makeText(context, "Error al crear el PDF", Toast.LENGTH_SHORT).show()
-    }
-}
-
-@SuppressLint("DefaultLocale")
-fun getNextFileName(): String {
-    // Directorio de descargas
-    val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-
-    // Prefijo y contador inicial
-    val prefix = "boleta_"
-    var counter = 1
-
-    // Incrementa el contador hasta encontrar un nombre de archivo no existente
-    var fileName: String
-    do {
-        fileName = "$prefix${String.format("%03d", counter)}"
-        counter++
-    } while (File(downloadsDir, "$fileName.pdf").exists())
-
-    return fileName // Retorna el nombre del archivo disponible
-}
-
-
-
-
-@Composable
-fun TicketDetailsView(ticketId: String, navController: NavController) {
-    val db = FirebaseFirestore.getInstance()
-    var ticket by remember { mutableStateOf<Ticket?>(null) }
-    var products by remember { mutableStateOf<List<Product>>(emptyList()) }
-
-    // Cargar los datos del ticket
-    LaunchedEffect(ticketId) {
-        db.collection("tickets")
-            .document(ticketId)
-            .get()
-            .addOnSuccessListener { document ->
-                ticket = document.toObject(Ticket::class.java)
-            }
-
-        // Cargar los productos del ticket (si están en una subcolección)
-        db.collection("tickets")
-            .document(ticketId)
-            .collection("products")
-            .get()
-            .addOnSuccessListener { result ->
-                products = result.map { it.toObject(Product::class.java) }
-            }
-    }
-
-    // Para mostrar los datos
-    if (ticket != null) {
-        Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 10.dp),
-                colors = CardDefaults.cardColors(MaterialTheme.colorScheme.tertiary),
-                shape = RoundedCornerShape(20.dp)
-            ) {
-                Column(
-                    modifier = Modifier.fillMaxWidth().padding(16.dp)
+                        .padding(horizontal = 15.dp)
+                        .height(50.dp),
+                    colors = ButtonDefaults.buttonColors(Color(0xff031982)),
+                    shape = RoundedCornerShape(15.dp)
                 ) {
-                    Row (
-                        Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Start
-                    ){
-                        Icon(
-                            modifier = Modifier.size(70.dp),
-                            tint = Color.Black,
-                            imageVector = Icons.Default.AccountCircle,
-                            contentDescription = null)
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Column(){
-                            Text("N°: ${ticket!!.id}",
-                                style = TextStyle(
-                                    color = MaterialTheme.colorScheme.primary,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 15.sp
-                                )
-                            )
-                            Text("RUC: ${ticket!!.ruc}")
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Row (
-                        Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ){
-                        Column(
-                        ) {
-                            Text(
-                                text = "${ticket!!.clientName}",
-                                style = TextStyle(color = Color.Black, fontWeight = FontWeight.Bold)
-                            )
-                            Text("${ticket!!.phoneNumber}")
-                            Text("${ticket!!.destination}")
-                        }
-                        Text("Fecha de Entrega: ${dateFormat.format(ticket!!.deliveryDate)}",
-                                style = TextStyle(color = Color.Black, fontWeight = FontWeight.Bold)
-                        )
-                    }
+                    Text(text = "Descargar PDF")
+                }
+                Button(
+                    onClick = { navController.popBackStack() },
+                    Modifier
 
-                    Spacer(modifier = Modifier.height(8.dp))
-                    // Mostrar la lista de productos
-                    Text(
-                        text = "Productos",
-                        style = MaterialTheme.typography.h6,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-                    Text(
-                        text = "Total: S/.${ticket!!.totalAmount}",
-                        style = MaterialTheme.typography.body1,
-                        modifier = Modifier.padding(bottom = 16.dp)
-                    )
-                    LazyColumn(modifier = Modifier.fillMaxSize()) {
-                        items(products) { product ->
-                            ProductItem(product)
-                        }
-                    }
+                        .padding(horizontal = 15.dp)
+                        .height(50.dp),
+                    colors = ButtonDefaults.buttonColors(Color(0xff031982)),
+                    shape = RoundedCornerShape(15.dp)
+                ) {
+                    Text(text = "Regresar")
                 }
             }
         }
-    } else {
-        // Mostrar un indicador de carga mientras se obtienen los datos
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator()
-        }
     }
 }
 
-*/
+@RequiresApi(Build.VERSION_CODES.Q)
+fun generatePdf(context: Context, ticket: Tickets) {
+    try {
+        val fileName = "ticket_${ticket.cod}.pdf"
+        val outputStream = createPdfWithMediaStore(context, fileName)
+            ?: throw Exception("No se pudo crear el archivo en MediaStore")
+
+        val pdfWriter = PdfWriter(outputStream)
+        val pdfDocument = PdfDocument(pdfWriter)
+        val document = Document(pdfDocument, PageSize.A5)
+
+        // Definir colores
+        val primaryColor = ColorConstants.DARK_GRAY
+        val secondaryColor = ColorConstants.GRAY
+        val accentColor = DeviceRgb(0, 102, 204)
+
+        // Formatear la fecha
+        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        val formattedDate = dateFormat.format(ticket.deliveryDate)
+
+        // Agregar logo o nombre de la empresa
+        val header = Table(UnitValue.createPercentArray(1)).useAllAvailableWidth()
+        header.addCell(
+            Cell().add(
+                Paragraph("DOÑA LILIA")
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setFontSize(20f)
+                    .setFontColor(primaryColor)
+                    .setBold()
+            ).setBorder(Border.NO_BORDER)
+        )
+        document.add(header)
+
+        // Información de la empresa
+        val companyInfo = Table(UnitValue.createPercentArray(1)).useAllAvailableWidth()
+        companyInfo.addCell(
+            Cell().add(
+                Paragraph("RUC: 20494645760\n" +
+                        "Correo: contacto.disvica@gmail.com\n" +
+                        "Teléfono: 995 018 533")
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setFontSize(10f)
+                    .setFontColor(secondaryColor)
+            ).setBorder(Border.NO_BORDER)
+        )
+        document.add(companyInfo)
+
+        // Título de la boleta
+        document.add(
+            Paragraph("BOLETA DE VENTA ELECTRÓNICA")
+                .setTextAlignment(TextAlignment.CENTER)
+                .setFontSize(14f)
+                .setFontColor(accentColor)
+                .setBold()
+                .setMarginTop(20f)
+        )
+
+        // Número de boleta
+        document.add(
+            Paragraph("N° ${ticket.cod}")
+                .setTextAlignment(TextAlignment.CENTER)
+                .setFontSize(12f)
+                .setFontColor(primaryColor)
+        )
+
+        // Información del cliente
+        val clientInfo = Table(UnitValue.createPercentArray(2)).useAllAvailableWidth()
+        clientInfo.setMarginTop(20f)
+
+        // Primera columna
+        clientInfo.addCell(
+            Cell().add(Paragraph("CLIENTE:")
+                .setFontColor(primaryColor)
+                .setBold()
+            ).setBorder(Border.NO_BORDER)
+        )
+        clientInfo.addCell(
+            Cell().add(Paragraph(ticket.clientName)
+                .setFontColor(secondaryColor)
+            ).setBorder(Border.NO_BORDER)
+        )
+
+        clientInfo.addCell(
+            Cell().add(Paragraph("TELÉFONO:")
+                .setFontColor(primaryColor)
+                .setBold()
+            ).setBorder(Border.NO_BORDER)
+        )
+        clientInfo.addCell(
+            Cell().add(Paragraph(ticket.phoneNumber)
+                .setFontColor(secondaryColor)
+            ).setBorder(Border.NO_BORDER)
+        )
+
+        clientInfo.addCell(
+            Cell().add(Paragraph("DESTINO:")
+                .setFontColor(primaryColor)
+                .setBold()
+            ).setBorder(Border.NO_BORDER)
+        )
+        clientInfo.addCell(
+            Cell().add(Paragraph(ticket.destination)
+                .setFontColor(secondaryColor)
+            ).setBorder(Border.NO_BORDER)
+        )
+
+        clientInfo.addCell(
+            Cell().add(Paragraph("FECHA DE ENTREGA:")
+                .setFontColor(primaryColor)
+                .setBold()
+            ).setBorder(Border.NO_BORDER)
+        )
+        clientInfo.addCell(
+            Cell().add(Paragraph(formattedDate)
+                .setFontColor(secondaryColor)
+            ).setBorder(Border.NO_BORDER)
+        )
+
+        document.add(clientInfo)
+
+        // Tabla de productos
+        val productTable = Table(UnitValue.createPercentArray(floatArrayOf(40f, 20f, 20f, 20f)))
+            .useAllAvailableWidth()
+            .setMarginTop(20f)
+
+        // Encabezados de la tabla
+        arrayOf("Producto", "Cantidad", "Precio Unit.", "Subtotal").forEach { header ->
+            productTable.addHeaderCell(
+                Cell().add(
+                    Paragraph(header)
+                        .setTextAlignment(TextAlignment.CENTER)
+                        .setFontColor(ColorConstants.WHITE)
+                        .setBold()
+                ).setBackgroundColor(accentColor)
+            )
+        }
+
+        // Contenido de la tabla
+        var total : Double = 0.0
+        ticket.products.forEach { product ->
+            val subtotal = product.quantity * product.unitPrice
+            total += subtotal
+
+            productTable.addCell(Cell().add(Paragraph(product.productName)))
+            productTable.addCell(Cell().add(Paragraph(product.quantity.toString())).setTextAlignment(TextAlignment.CENTER))
+            productTable.addCell(Cell().add(Paragraph("S/ ${String.format("%.2f", product.unitPrice)}")).setTextAlignment(TextAlignment.RIGHT))
+            productTable.addCell(Cell().add(Paragraph("S/ ${String.format("%.2f", subtotal)}")).setTextAlignment(TextAlignment.RIGHT))
+        }
+
+        document.add(productTable)
+
+        // Total
+        val totalTable = Table(UnitValue.createPercentArray(floatArrayOf(80f, 20f)))
+            .useAllAvailableWidth()
+            .setMarginTop(10f)
+
+        totalTable.addCell(
+            Cell().add(
+                Paragraph("TOTAL:")
+                    .setTextAlignment(TextAlignment.RIGHT)
+                    .setFontColor(primaryColor)
+                    .setBold()
+            ).setBorder(Border.NO_BORDER)
+        )
+        totalTable.addCell(
+            Cell().add(
+                Paragraph("S/ ${String.format("%.2f", total)}")
+                    .setTextAlignment(TextAlignment.RIGHT)
+                    .setFontColor(primaryColor)
+                    .setBold()
+            ).setBorder(Border.NO_BORDER)
+        )
+        document.add(totalTable)
+
+        // Pie de página
+        val footer = Table(UnitValue.createPercentArray(1)).useAllAvailableWidth()
+        footer.setMarginTop(30f)
+        footer.addCell(
+            Cell().add(
+                Paragraph("¡Gracias por su compra!")
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setFontColor(accentColor)
+                    .setItalic()
+            ).setBorder(Border.NO_BORDER)
+        )
+        document.add(footer)
+
+        document.close()
+
+        Toast.makeText(context, "PDF guardado correctamente en Descargas", Toast.LENGTH_LONG).show()
+
+    } catch (e: Exception) {
+        e.printStackTrace()
+        Toast.makeText(context, "Error al generar el PDF: ${e.message}", Toast.LENGTH_SHORT).show()
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.Q)
+fun createPdfWithMediaStore(context: Context, fileName: String): OutputStream? {
+    val resolver = context.contentResolver
+    val contentValues = ContentValues().apply {
+        put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
+        put(MediaStore.MediaColumns.MIME_TYPE, "application/pdf")
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            put(MediaStore.MediaColumns.RELATIVE_PATH, "${Environment.DIRECTORY_DOWNLOADS}")
+        }
+    }
+    val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
+    return uri?.let { resolver.openOutputStream(it) }
+}

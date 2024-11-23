@@ -12,9 +12,22 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Face
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Numbers
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.Place
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,6 +45,7 @@ import com.example.dona_lilia.features.models.Tickets
 import com.example.dona_lilia.features.models.Users
 import com.example.dona_lilia.features.services.FirebaseService
 import com.example.dona_lilia.shared.components.*
+import java.util.Calendar
 import java.util.Date
 
 
@@ -39,7 +53,15 @@ import java.util.Date
 fun CreateOrderView(
     navController: NavController
 ) {
-    val context = LocalContext.current
+
+    // Estados para los datos del cliente
+    var name = remember { mutableStateOf("") }
+    var reference = remember { mutableStateOf("") }
+    var phoneNumber = remember { mutableStateOf("") }
+    var ruc = remember { mutableStateOf("") }
+    var destination = remember { mutableStateOf("") }
+    var date = remember { mutableStateOf("") }
+    var context = LocalContext.current
     val db = FirebaseService()
     CusttomLayout(
         title = "CREAR PEDIDO"
@@ -66,8 +88,16 @@ fun CreateOrderView(
 
                 Spacer(modifier = Modifier.height(20.dp))
 
+
                 // Inputs for customer details
-                CustomerInputFields()
+                CustomerInputFields(
+                    name = name,
+                    reference = reference,
+                    phoneNumber = phoneNumber,
+                    ruc = ruc,
+                    destination = destination,
+                    date = date
+                )
 
                 Spacer(modifier = Modifier.height(20.dp))
 
@@ -115,7 +145,7 @@ fun CreateOrderView(
                 Spacer(modifier = Modifier.height(20.dp))
 
                 CustomButton(text = "CREAR") {
-                    Toast.makeText(context, "Agregado", Toast.LENGTH_LONG).show()
+
                     // Action to create order
                     val product = Products(
                         productName = "Producto A",
@@ -139,15 +169,29 @@ fun CreateOrderView(
 
 
                     val user = Users(
-                        name = "Usuario A",
-                        ruc = "12345678901",
-                        phone = "987654321",
-                        address = "Dirección A",
-                        referece = "Referencia",
-                        destine = "Europe",
-                        date = "2014-23-11"
+                        name = name.value,
+                        ruc = ruc.value,
+                        phone = phoneNumber.value,
+                        address = destination.value,
+                        referece = reference.value,
+                        destine = destination.value,
+                        date = date.value
                     )
-                    db.addUser(user)
+                    if (name.value.isBlank() || phoneNumber.value.isBlank()) {
+                        Toast.makeText(context, "Por favor, completa todos los campos.", Toast.LENGTH_SHORT).show()
+                    } else {
+                        name.value = ""
+                        reference.value = ""
+                        phoneNumber.value = ""
+                        destination.value = ""
+                        date.value = ""
+                        ruc.value = ""
+                        Toast.makeText(context, "Usuario agregado con éxito", Toast.LENGTH_LONG).show()
+                        db.addUser(user)
+
+                    }
+
+                    //db.addUser(user)
                     db.addTicket(ticket)
                     db.addProduct(product)
 
@@ -162,21 +206,108 @@ fun CreateOrderView(
 }
 
 @Composable
-fun CustomerInputFields() {
-    // Helper composable for repeated input fields
-    val fields = listOf("Nombre", "Referencia", "Telefono", "R.U.C", "Destino", "Fecha E")
-    fields.forEach { label ->
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
+fun CustomerInputFields(
+    name: MutableState<String>,
+    reference: MutableState<String>,
+    phoneNumber: MutableState<String>,
+    ruc: MutableState<String>,
+    destination: MutableState<String>,
+    date: MutableState<String>
+) {
+    Column {
+        // Nombre
+        CustomInput(
+            label = "Nombre",
+            value = name.value,
+            imageVector = Icons.Default.Person,
+        ) { name.value = it }
+        Spacer(modifier = Modifier.height(10.dp))
+
+        // Referencia
+        CustomInput(
+            label = "Referencia",
+            value = reference.value,
+            imageVector = Icons.Filled.Bookmark,
+        ) { reference.value = it }
+        Spacer(modifier = Modifier.height(10.dp))
+
+        // Teléfono
+        CustomInput(
+            label = "Numero",
+            value = phoneNumber.value,
+            imageVector = Icons.Default.Phone,
+        ) { phoneNumber.value = it }
+        Spacer(modifier = Modifier.height(10.dp))
+
+        // R.U.C.
+        CustomInput(
+            label = "R.U.C",
+            value = ruc.value,
+            imageVector = Icons.Filled.Numbers,
+        ) { ruc.value = it }
+        Spacer(modifier = Modifier.height(10.dp))
+
+        // Destino
+        CustomInput(
+            label = "Destino",
+            value = destination.value,
+            imageVector = Icons.Default.Place,
+        ) { destination.value = it }
+        Spacer(modifier = Modifier.height(10.dp))
+
+        // Fecha
+        DatePickerField(label = "Fecha", selectedDate = date)
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DatePickerField(label: String, selectedDate: MutableState<String>) {
+    val context = LocalContext.current
+    val calendar = Calendar.getInstance()
+
+    // Listener para seleccionar la fecha
+    val datePicker = android.app.DatePickerDialog(
+        context,
+        { _, year, month, dayOfMonth ->
+            val formattedDate = String.format("%02d-%02d-%d", dayOfMonth, month + 1, year)
+            selectedDate.value = formattedDate
+        },
+        calendar.get(Calendar.YEAR),
+        calendar.get(Calendar.MONTH),
+        calendar.get(Calendar.DAY_OF_MONTH)
+    )
+
+    // Restringir el DatePicker para fechas a partir de hoy
+    datePicker.datePicker.minDate = System.currentTimeMillis()
+
+    // Campo de texto para abrir el DatePicker
+    Box(
+        modifier = Modifier
+
+            .width(280.dp)
+            .clickable { datePicker.show() }
+            .border(1.dp, Color.Black, RoundedCornerShape(10.dp))
+            .background(Color.White),
+
+    ) {
+
+        Row (
+            modifier = Modifier
+                .padding(15.dp),
         ) {
-            CustomLabel(text = "$label:")
-            Spacer(modifier = Modifier.width(10.dp))
-            CustomInput(value = "") {
-                
-            }
+            Icon(
+                imageVector = Icons.Filled.DateRange,
+                contentDescription = null,
+            )
+
+            Spacer(modifier = Modifier.width(18.dp))
+            Text(
+                text = if (selectedDate.value.isEmpty()) label else selectedDate.value,
+                color = if (selectedDate.value.isEmpty()) Color.Black else Color.Black,
+                fontSize = 16.sp
+            )
         }
-        Spacer(modifier = Modifier.height(5.dp))
     }
 }
 

@@ -51,6 +51,7 @@ android {
 }
 
 dependencies {
+    implementation("androidx.compose.material:material-icons-extended:1.7.5")
     implementation("net.datafaker:datafaker:2.4.1")
     implementation(platform("com.google.firebase:firebase-bom:33.6.0"))
     implementation("com.google.firebase:firebase-database-ktx:21.0.0")

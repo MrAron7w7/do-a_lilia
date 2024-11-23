@@ -8,4 +8,5 @@ sealed class ItemNavigation ( val route : String ) {
     data object  TicketListView : ItemNavigation (Routes.TicketListView.name)
     data object  TicketDetailsView : ItemNavigation (Routes.TicketDetailsView.name)
     data object  ProductsView : ItemNavigation (Routes.ProductsView.name)
+    data object  CreateProductView : ItemNavigation (Routes.CreateProductView.name)
 }

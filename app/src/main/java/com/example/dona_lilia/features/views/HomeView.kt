@@ -70,12 +70,6 @@ fun HomeView (
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceAround,
             ) {
-                CustomCardHome(
-                    text = "Gestion Clientes",
-                    painter = painterResource(id = R.drawable.people)
-                ) {
-                    //navController.navigate(ItemNavigation.CreateOrderView.route)
-                }
 
                 CustomCardHome(
                     text = "Nuevo Pedido",

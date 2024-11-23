@@ -41,7 +41,6 @@ import com.example.dona_lilia.shared.theme.colorcard
 @Composable
 fun ProductsView(navController: NavController) {
     val productsList = remember { mutableStateListOf<Products>() }
-    val navController = rememberNavController()
 
     LaunchedEffect(true) {
         FirebaseService().fetchProducts().collect { productList ->
@@ -70,7 +69,7 @@ fun ProductsView(navController: NavController) {
             }
 
             CustomButton(text = "Agregar") {
-                //navController.navigate(ItemNavigation.CreateProductView.route)
+                navController.navigate(ItemNavigation.CreateProductView.route)
             }
         }
 

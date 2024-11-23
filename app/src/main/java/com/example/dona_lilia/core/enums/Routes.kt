@@ -6,4 +6,5 @@ enum class Routes {
     TicketDetailsView,
     CreateOrderView,
     ProductsView,
+    CreateProductView,
 }

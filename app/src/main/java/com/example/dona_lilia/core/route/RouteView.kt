@@ -14,6 +14,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.dona_lilia.features.models.Tickets
 import com.example.dona_lilia.features.services.FirebaseService
 import com.example.dona_lilia.features.views.CreateOrderView
+import com.example.dona_lilia.features.views.CreateProductView
 import com.example.dona_lilia.features.views.HomeView
 import com.example.dona_lilia.features.views.ProductsView
 import com.example.dona_lilia.features.views.TicketDetails
@@ -88,6 +89,13 @@ fun RouteView () {
             route = ItemNavigation.ProductsView.route
         ) {
             ProductsView(navController)
+        }
+
+        // -> ProductsView
+        composable(
+            route = ItemNavigation.CreateProductView.route
+        ) {
+            CreateProductView(navController)
         }
     }
 }
