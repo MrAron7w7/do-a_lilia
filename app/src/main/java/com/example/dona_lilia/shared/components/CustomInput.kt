@@ -25,35 +25,31 @@ fun CustomInput(
     label: String? = null,
     imageVector: ImageVector? = null,
     modifier: Modifier = Modifier,
+    keyboardType: KeyboardType = KeyboardType.Text, // Nuevo parámetro opcional
     onValueChange: (String) -> Unit
 ) {
-  OutlinedTextField(
-      leadingIcon = {
-          imageVector?.let {  // Solo mostrar el ícono si no es nulo
-              Icon(imageVector = it, contentDescription = null)
-          }
-      },
-      value = value,
-      label = {
-          label?.let {  // Solo mostrar el label si no es nulo
-              Text(text = it)
-          }
-      },
-      onValueChange = onValueChange,
-      //modifier = Modifier.height(45.dp),
-      keyboardOptions = KeyboardOptions(
-          keyboardType = KeyboardType.Text
-      ),
-      shape = RoundedCornerShape(10.dp),
-      colors = TextFieldDefaults.colors(
-          //focusedTextColor = MaterialTheme.colorScheme.primary,
-          //unfocusedTextColor = MaterialTheme.colorScheme.primary,
-          disabledTextColor = Color.Red,
-          focusedContainerColor = Color.White,
-          unfocusedContainerColor = Color.White,
-          cursorColor = Color.DarkGray,
-      ),
-
-
-  )
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = {
+            label?.let {
+                Text(text = it)
+            }
+        },
+        leadingIcon = {
+            imageVector?.let {
+                Icon(imageVector = it, contentDescription = null)
+            }
+        },
+        keyboardOptions = KeyboardOptions(
+            keyboardType = keyboardType // Usamos el tipo de teclado aquí
+        ),
+        shape = RoundedCornerShape(10.dp),
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = Color.White,
+            unfocusedContainerColor = Color.White,
+            cursorColor = Color.DarkGray,
+        ),
+        modifier = modifier.height(60.dp) // Ajuste de altura para consistencia
+    )
 }

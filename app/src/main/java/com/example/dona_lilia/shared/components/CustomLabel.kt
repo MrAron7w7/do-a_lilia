@@ -2,6 +2,7 @@ package com.example.dona_lilia.shared.components
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -13,6 +14,8 @@ import androidx.compose.ui.unit.sp
 
 fun CustomLabel (
 
+    modifier: Modifier = Modifier,
+
     text : String,
 
     fontSize :  TextUnit = 16.sp,
@@ -23,6 +26,7 @@ fun CustomLabel (
 
     ) {
     Text(
+        modifier = modifier,
 
         text =  text ,
 

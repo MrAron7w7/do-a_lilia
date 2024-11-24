@@ -5,7 +5,6 @@ data class Users(
     var name:String,
     var ruc:String,
     var phone:String,
-    var address:String,
     var referece:String,
     var destine : String,
     var date: String,

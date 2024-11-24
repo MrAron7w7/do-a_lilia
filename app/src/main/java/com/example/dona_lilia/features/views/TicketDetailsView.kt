@@ -11,6 +11,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -34,7 +35,11 @@ import androidx.navigation.NavController
 import androidx.core.content.FileProvider
 import com.example.dona_lilia.features.models.Tickets
 import com.example.dona_lilia.shared.components.CusttomLayout
+import com.example.dona_lilia.shared.components.InfoRow
 import com.example.dona_lilia.shared.components.ProductItem
+import com.example.dona_lilia.shared.theme.colorcard
+import com.example.dona_lilia.shared.theme.secondary
+import com.example.dona_lilia.shared.theme.textColorUnselected
 import com.itextpdf.kernel.colors.ColorConstants
 import com.itextpdf.kernel.colors.DeviceRgb
 import com.itextpdf.kernel.geom.PageSize
@@ -63,112 +68,227 @@ fun TicketDetails(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
+                .navigationBarsPadding()
         ) {
-            // Información del cliente
+            // Tarjeta principal con sombra y bordes suaves
             Card(
                 modifier = Modifier
                     .weight(1f)
                     .padding(vertical = 10.dp),
-                colors = CardDefaults.cardColors(MaterialTheme.colorScheme.tertiary),
-                shape = RoundedCornerShape(20.dp)
+                colors = CardDefaults.cardColors(
+                    containerColor = Color.White,
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                shape = RoundedCornerShape(24.dp)
             ) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp)
+                        .padding(20.dp)
                 ) {
+                    // Encabezado con información principal
                     Row(
                         Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Start,
+                        horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(
-                            modifier = Modifier.size(70.dp),
-                            tint = Color.Black,
-                            imageVector = Icons.Default.AccountCircle,
-                            contentDescription = null
-                        )
-                        Spacer(modifier = Modifier.width(15.dp))
-                        Column {
-                            Text(
-                                "N°: ${ticket.cod}",
-                                style = TextStyle(
-                                    color = MaterialTheme.colorScheme.primary,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 20.sp
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Card(
+                                shape = CircleShape,
+                                colors = CardDefaults.cardColors(
+                                    containerColor = colorcard
                                 )
-                            )
-                            Text("RUC: ${ticket.ruc}", style = TextStyle(color = Color.Black))
+                            ) {
+                                Icon(
+                                    modifier = Modifier
+                                        .padding(12.dp)
+                                        .size(32.dp),
+                                    tint = Color.Black,
+                                    imageVector = Icons.Default.AccountCircle,
+                                    contentDescription = null
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(16.dp))
+                            Column {
+                                Text(
+                                    "Boleta N° ${ticket.cod}",
+                                    style = MaterialTheme.typography.titleLarge.copy(
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                )
+                                Text(
+                                    "RUC: ${ticket.ruc}",
+                                    style = MaterialTheme.typography.bodyMedium.copy(
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                )
+                            }
                         }
-                    }
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Row(
-                        Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Column {
-                            Text(
-                                text = "Cliente: ${ticket.clientName}",
-                                style = TextStyle(color = Color.Black, fontWeight = FontWeight.Bold)
-                            )
-                            Text(ticket.phoneNumber, style = TextStyle(color = Color.Black))
-                            Text(ticket.destination, style = TextStyle(color = Color.Black))
-                        }
-                        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-                        Text(
-                            "Fecha de Entrega: ${dateFormat.format(ticket.deliveryDate)}",
-                            style = TextStyle(color = Color.Black, fontWeight = FontWeight.Bold)
-                        )
                     }
 
-                    Spacer(modifier = Modifier.height(10.dp))
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    // Información del cliente en una tarjeta secundaria
+                    Card(
+                        colors = CardDefaults.cardColors(
+                            containerColor = colorcard
+                        ),
+                        shape = RoundedCornerShape(16.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                        ) {
+                            Text(
+                                "Información del Cliente",
+                                style = MaterialTheme.typography.titleMedium.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                                )
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Row(
+                                Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    InfoRow(
+                                        label = "Cliente",
+                                        value = ticket.clientName,
+                                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                                    )
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    InfoRow(
+                                        label = "Teléfono",
+                                        value = ticket.phoneNumber,
+                                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                                    )
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    InfoRow(
+                                        label = "Destino",
+                                        value = ticket.destination,
+                                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                                    )
+                                }
+                                Column(
+                                    horizontalAlignment = Alignment.End,
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                                    Text(
+                                        "Fecha de Entrega",
+                                        style = MaterialTheme.typography.bodySmall.copy(
+                                            color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f)
+                                        )
+                                    )
+                                    Text(
+                                        dateFormat.format(ticket.deliveryDate),
+                                        style = MaterialTheme.typography.bodyLarge.copy(
+                                            fontWeight = FontWeight.Bold,
+                                            color = MaterialTheme.colorScheme.onSecondaryContainer
+                                        )
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    // Sección de productos
                     Text(
-                        text = "Productos Seleccionados",
-                        style = TextStyle(color = Color.Black, fontWeight = FontWeight.Bold
+                        text = "Productos Seleccionados (${ticket.products.size})",
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Bold
                         )
                     )
-                    Text(
-                        "Cantidad: ${ticket.products.size} productos",
-                        style = TextStyle(color = Color.Black, fontWeight = FontWeight.Bold
-                        )
-                    )
+                    Spacer(modifier = Modifier.height(12.dp))
 
                     LazyColumn(
                         modifier = Modifier.weight(1f),
-                        verticalArrangement = Arrangement.Top
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         items(ticket.products) { product ->
-                            ProductItem(product = product)
+                            Card(
+                                colors = CardDefaults.cardColors(
+                                    containerColor = colorcard
+                                ),
+                                shape = RoundedCornerShape(12.dp)
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(12.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text(
+                                            product.productName,
+                                            style = MaterialTheme.typography.bodyLarge.copy(
+                                                fontWeight = FontWeight.Medium
+                                            )
+                                        )
+                                        Text(
+                                            "Cantidad: ${product.quantity}",
+                                            style = MaterialTheme.typography.bodyMedium.copy(
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        )
+                                    }
+                                    Text(
+                                        "S/ ${String.format("%.2f", product.unitPrice * product.quantity)}",
+                                        style = MaterialTheme.typography.titleMedium.copy(
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    )
+                                }
+                            }
                         }
                     }
                 }
             }
-            Spacer(modifier = Modifier.height(8.dp))
+
+            // Botones de acción
             Row(
-                Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceAround
+                Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Button(
                     onClick = { generatePdf(context, ticket) },
-                    Modifier
-
-                        .padding(horizontal = 15.dp)
-                        .height(50.dp),
-                    colors = ButtonDefaults.buttonColors(Color(0xff031982)),
-                    shape = RoundedCornerShape(15.dp)
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(56.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary
+                    ),
+                    shape = RoundedCornerShape(16.dp)
                 ) {
-                    Text(text = "Descargar PDF")
+                    Text(
+                        text = "Descargar PDF",
+
+                    )
                 }
                 Button(
                     onClick = { navController.popBackStack() },
-                    Modifier
-
-                        .padding(horizontal = 15.dp)
-                        .height(50.dp),
-                    colors = ButtonDefaults.buttonColors(Color(0xff031982)),
-                    shape = RoundedCornerShape(15.dp)
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(56.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = secondary,
+                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                    ),
+                    shape = RoundedCornerShape(16.dp)
                 ) {
-                    Text(text = "Regresar")
+                    Text(
+                        text = "Regresar",
+
+                    )
                 }
             }
         }
